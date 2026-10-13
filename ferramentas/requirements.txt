@@ -1,0 +1,4 @@
+# Mesma versao do Faker usada no jornada_dados_nosql: e ela que garante que
+# a semente 42 gera exatamente as mesmas pessoas e os mesmos pedidos.
+Faker==33.1.0
+psycopg2-binary==2.9.10

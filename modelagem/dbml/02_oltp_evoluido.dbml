@@ -1,0 +1,180 @@
+// ==========================================================================
+// Liga Sudoers - OLTP EVOLUIDO (o seu alvo na etapa 3)
+// Cole este arquivo em https://dbdiagram.io para ver o diagrama.
+//
+// As 6 tabelas do legado continuam aqui. O que e NOVO esta marcado:
+//   - tabelas novas  : cabecalho verde
+//   - colunas novas  : note 'NOVO'
+//
+// ATENCAO: os scripts liga_sudoers_historico.py e liga_sudoers_streaming.py
+// conferem o SEU banco contra ESTE arquivo antes de gravar qualquer dado.
+// Se faltar tabela, coluna, chave ou trigger, eles param e dizem o que falta.
+// ==========================================================================
+
+// --------------------------------------------------------------- legado
+
+Table pessoas {
+  id bigint [pk]
+  nome varchar(255) [not null]
+  sexo varchar(1) [not null, default: 'M']
+  dt_nasc date [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table categorias {
+  id integer [pk, increment]
+  descricao varchar(255) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table produtos {
+  id integer [pk, increment]
+  id_categoria integer [not null]
+  descricao varchar(255) [not null]
+  valor_unit numeric(10,2) [not null]
+  peso_gramas integer [note: 'NOVO - Demanda 2: o frete e pago por peso']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table pedidos {
+  id integer [pk, increment]
+  id_pessoa bigint [not null]
+  dt_venda timestamp [not null]
+  valor_total numeric(10,2) [not null]
+  id_endereco_entrega integer [note: 'NOVO - Demanda 2: para onde o pedido vai']
+  status varchar(20) [not null, default: 'criado', note: 'NOVO - Demanda 3: situacao atual do pedido']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table itens_pedidos {
+  id_pedido integer [not null]
+  id_produto integer [not null]
+  qtde integer [not null]
+  valor_total numeric(10,2) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (id_pedido, id_produto) [pk]
+  }
+}
+
+Table auditoria_pedidos {
+  id_pedido integer [pk]
+  dispositivo varchar(50) [not null]
+  geohash varchar(50) [not null]
+  telefone varchar(20) [not null]
+  device_id varchar(20) [note: 'NOVO - Demanda 1: identificador do aparelho fisico']
+  uf char(2) [note: 'NOVO - Demanda 1: UF de onde a compra foi feita']
+  is_fraude boolean [not null, default: false, note: 'NOVO - Demanda 1: fraude confirmada?']
+  motivo_fraude varchar(30) [note: 'NOVO - Demanda 1: geolocalizacao, troca_dispositivo, dispositivo_compartilhado']
+  dt_fraude timestamp [note: 'NOVO - Demanda 1: quando a fraude foi confirmada']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+// ------------------------------------------------ Demanda 1 - antifraude
+
+Table dispositivos [headercolor: #2D6512] {
+  device_id varchar(20) [pk]
+  modelo varchar(50) [not null]
+  sistema varchar(20) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+// ------------------------------------------------- Demanda 2 - logistica
+
+Table enderecos [headercolor: #2D6512] {
+  id integer [pk, increment]
+  id_pessoa bigint [not null]
+  logradouro varchar(255) [not null]
+  cidade varchar(100) [not null]
+  uf char(2) [not null]
+  cep varchar(9) [not null]
+  is_principal boolean [not null, default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table transportadoras [headercolor: #2D6512] {
+  id integer [pk, increment]
+  nome varchar(100) [not null]
+  cnpj varchar(18) [not null, unique]
+  custo_por_kg numeric(10,2) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table transportes [headercolor: #2D6512] {
+  id integer [pk, increment]
+  id_transportadora integer [not null]
+  placa varchar(8) [not null]
+  peso_total_gramas integer [not null, default: 0]
+  valor_frete numeric(10,2) [not null, default: 0]
+  dt_saida timestamp [not null]
+  dt_entrega_prevista timestamp [not null]
+  dt_entrega timestamp [note: 'nulo enquanto o caminhao esta em transito']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table carga_pedidos [headercolor: #2D6512] {
+  id_transporte integer [not null]
+  id_pedido integer [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (id_transporte, id_pedido) [pk]
+  }
+}
+
+// ------------------------------------------- Demanda 3 - ciclo do pedido
+
+Table status_pedidos [headercolor: #2D6512] {
+  id_pedido integer [not null]
+  status varchar(20) [not null]
+  dt_evento timestamp [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (id_pedido, status) [pk]
+  }
+}
+
+Table pagamentos [headercolor: #2D6512] {
+  id integer [pk, increment]
+  id_pedido integer [not null]
+  forma varchar(20) [not null]
+  parcelas integer [not null, default: 1]
+  valor numeric(10,2) [not null]
+  status varchar(20) [not null, default: 'pendente']
+  dt_pagamento timestamp [note: 'nulo enquanto o pagamento esta pendente']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+// ---------------------------------------------------- relacionamentos
+
+// legado
+Ref: produtos.id_categoria > categorias.id
+Ref: pedidos.id_pessoa > pessoas.id
+Ref: itens_pedidos.id_pedido > pedidos.id
+Ref: itens_pedidos.id_produto > produtos.id
+Ref: auditoria_pedidos.id_pedido > pedidos.id
+
+// novos
+Ref: auditoria_pedidos.device_id > dispositivos.device_id
+Ref: enderecos.id_pessoa > pessoas.id
+Ref: pedidos.id_endereco_entrega > enderecos.id
+Ref: transportes.id_transportadora > transportadoras.id
+Ref: carga_pedidos.id_transporte > transportes.id
+Ref: carga_pedidos.id_pedido > pedidos.id
+Ref: status_pedidos.id_pedido > pedidos.id
+Ref: pagamentos.id_pedido > pedidos.id

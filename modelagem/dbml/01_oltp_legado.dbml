@@ -1,0 +1,67 @@
+// ==========================================================================
+// Liga Sudoers - OLTP LEGADO (ponto de partida)
+// Cole este arquivo em https://dbdiagram.io para ver o diagrama.
+// Origem: liga_sudoers/modelagem/ddl/modelagem.txt
+// ==========================================================================
+
+Table pessoas {
+  id bigint [pk]
+  nome varchar(255) [not null]
+  sexo varchar(1) [not null, default: 'M']
+  dt_nasc date [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table categorias {
+  id integer [pk, increment]
+  descricao varchar(255) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table produtos {
+  id integer [pk, increment]
+  id_categoria integer [not null]
+  descricao varchar(255) [not null]
+  valor_unit numeric(10,2) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table pedidos {
+  id integer [pk, increment]
+  id_pessoa bigint [not null]
+  dt_venda timestamp [not null]
+  valor_total numeric(10,2) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table itens_pedidos {
+  id_pedido integer [not null]
+  id_produto integer [not null]
+  qtde integer [not null]
+  valor_total numeric(10,2) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (id_pedido, id_produto) [pk]
+  }
+}
+
+Table auditoria_pedidos {
+  id_pedido integer [pk]
+  dispositivo varchar(50) [not null]
+  geohash varchar(50) [not null]
+  telefone varchar(20) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Ref: produtos.id_categoria > categorias.id
+Ref: pedidos.id_pessoa > pessoas.id
+Ref: itens_pedidos.id_pedido > pedidos.id
+Ref: itens_pedidos.id_produto > produtos.id
+Ref: auditoria_pedidos.id_pedido > pedidos.id

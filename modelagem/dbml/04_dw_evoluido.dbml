@@ -1,0 +1,194 @@
+// ==========================================================================
+// Liga Sudoers - DW EVOLUIDO (o seu alvo na etapa 6)
+// Cole este arquivo em https://dbdiagram.io para ver o diagrama.
+//
+//   - tabelas novas  : cabecalho verde (dimensoes) ou roxo (fatos)
+//   - colunas novas  : note 'NOVO'
+//
+// ATENCAO: `make conferir-dw` e `make etl` conferem o SEU banco contra ESTE
+// arquivo. Se faltar algo, o ETL nao roda e a mensagem diz o que falta.
+// ==========================================================================
+
+// ------------------------------------------------------------- dimensoes
+
+Table dim_tempo [headercolor: #2D6512] {
+  sk_tempo integer [pk, note: 'data no formato AAAAMMDD, ex.: 20261013']
+  data date [not null, unique]
+  ano integer [not null]
+  trimestre integer [not null]
+  mes integer [not null]
+  nome_mes varchar(20) [not null]
+  semana_ano integer [not null]
+  dia integer [not null]
+  dia_semana integer [not null, note: '1 = segunda ... 7 = domingo']
+  nome_dia varchar(20) [not null]
+  is_fim_semana boolean [not null]
+  is_feriado boolean [not null]
+}
+
+Table dim_localidade [headercolor: #2D6512] {
+  sk_localidade integer [pk, increment]
+  uf char(2) [not null, unique]
+  nome_uf varchar(50) [not null]
+  regiao varchar(20) [not null]
+  is_area_atendida boolean [not null, note: 'a Liga Sudoers so vende em SP, MG e RJ']
+}
+
+Table dim_pessoas {
+  sk_pessoa integer [pk, increment]
+  id bigint [not null]
+  nome varchar(255)
+  sexo varchar(1)
+  dt_nasc date
+  id_endereco integer [note: 'NOVO - o endereco que originou esta versao']
+  cidade varchar(100) [note: 'NOVO']
+  uf char(2) [note: 'NOVO']
+  dt_inicio timestamp [not null, note: 'NOVO - SCD tipo 2: inicio da validade']
+  dt_fim timestamp [note: 'NOVO - SCD tipo 2: fim da validade (nulo = vigente)']
+  is_atual boolean [not null, default: true, note: 'NOVO - SCD tipo 2: e a versao vigente?']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table dim_produtos {
+  sk_produto integer [pk, increment]
+  id integer [not null]
+  cat_desc varchar(255)
+  descricao varchar(255)
+  peso_gramas integer [note: 'NOVO']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table dim_dispositivo [headercolor: #2D6512] {
+  sk_dispositivo integer [pk, increment]
+  device_id varchar(20) [not null, unique]
+  modelo varchar(50) [not null]
+  sistema varchar(20) [not null]
+  fabricante varchar(30) [not null, note: 'derivado do modelo durante o ETL']
+  qtd_contas integer [not null, default: 0, note: 'quantas pessoas diferentes ja compraram por este aparelho']
+  is_compartilhado boolean [not null, default: false, note: '3 contas ou mais = suspeita de anel de fraude']
+}
+
+Table dim_transportadora [headercolor: #2D6512] {
+  sk_transportadora integer [pk, increment]
+  id integer [not null, unique]
+  nome varchar(100) [not null]
+  cnpj varchar(18) [not null]
+  custo_por_kg numeric(10,2) [not null]
+}
+
+Table dim_forma_pagamento [headercolor: #2D6512] {
+  sk_forma_pagamento integer [pk, increment]
+  forma varchar(20) [not null, unique]
+  descricao varchar(50) [not null]
+  is_a_vista boolean [not null]
+}
+
+// ----------------------------------------------------------------- fatos
+
+// FATO TRANSACIONAL - grao: 1 linha por ITEM de pedido
+Table fato_pedidos {
+  sk_id integer [pk, increment]
+  id_pedido integer [not null]
+  id_produto integer [not null, note: 'NOVO - com id_pedido forma a chave de negocio da linha']
+  sk_tempo integer [not null, note: 'NOVO']
+  sk_pessoa bigint [not null]
+  sk_produto integer [not null]
+  sk_dispositivo integer [not null, note: 'NOVO']
+  sk_localidade integer [not null, note: 'NOVO - UF de onde a compra foi feita']
+  sk_forma_pagamento integer [not null, note: 'NOVO']
+  geohash varchar(50) [not null]
+  dt_venda timestamp [not null]
+  qtde integer [not null]
+  valor_unit numeric(10,2) [not null, note: 'agora e o preco unitario de verdade']
+  valor_total numeric(10,2) [not null, note: 'NOVO - valor do ITEM (substitui a coluna total)']
+  peso_gramas integer [not null, note: 'NOVO - peso do item (qtde x peso do produto)']
+  status varchar(20) [not null, note: 'NOVO - situacao atual do pedido']
+  is_fraude boolean [not null, note: 'NOVO']
+  motivo_fraude varchar(30) [note: 'NOVO']
+
+  indexes {
+    (id_pedido, id_produto) [unique]
+  }
+}
+
+// FATO TRANSACIONAL - grao: 1 linha por PEDIDO embarcado em um TRANSPORTE
+Table fato_entregas [headercolor: #6724BB] {
+  sk_id integer [pk, increment]
+  id_transporte integer [not null]
+  id_pedido integer [not null]
+  sk_transportadora integer [not null]
+  sk_pessoa bigint [not null]
+  sk_localidade integer [not null, note: 'UF de destino']
+  sk_tempo_saida integer [not null]
+  sk_tempo_entrega integer [note: 'nulo enquanto esta em transito']
+  dt_saida timestamp [not null]
+  dt_entrega_prevista timestamp [not null]
+  dt_entrega timestamp
+  peso_gramas integer [not null]
+  valor_frete numeric(10,2) [not null, note: 'frete do caminhao rateado pelo peso do pedido']
+  dias_transito integer
+  dias_atraso integer
+  is_entregue boolean [not null]
+  is_atrasada boolean [not null]
+
+  indexes {
+    (id_transporte, id_pedido) [unique]
+  }
+}
+
+// FATO SNAPSHOT ACUMULADO - grao: 1 linha por PEDIDO (atualizada a cada marco)
+Table fato_ciclo_pedido [headercolor: #6724BB] {
+  id_pedido integer [pk]
+  sk_pessoa bigint [not null]
+  sk_tempo_criado integer [not null]
+  status_atual varchar(20) [not null]
+  dt_criado timestamp [not null]
+  dt_pago timestamp
+  dt_separado timestamp
+  dt_enviado timestamp
+  dt_entregue timestamp
+  dt_cancelado timestamp
+  dt_devolvido timestamp
+  horas_ate_pagamento numeric(10,2)
+  horas_ate_envio numeric(10,2)
+  horas_ate_entrega numeric(10,2)
+  valor_total numeric(10,2) [not null]
+  is_fraude boolean [not null]
+}
+
+// FATO SNAPSHOT PERIODICO - grao: 1 linha por DIA e TRANSPORTADORA
+Table fato_peso_diario [headercolor: #6724BB] {
+  sk_tempo integer [not null]
+  sk_transportadora integer [not null]
+  qtd_transportes integer [not null]
+  qtd_pedidos integer [not null]
+  peso_total_gramas bigint [not null]
+  valor_frete_total numeric(12,2) [not null]
+
+  indexes {
+    (sk_tempo, sk_transportadora) [pk]
+  }
+}
+
+// ---------------------------------------------------- relacionamentos
+
+Ref: fato_pedidos.sk_tempo > dim_tempo.sk_tempo
+Ref: fato_pedidos.sk_pessoa > dim_pessoas.sk_pessoa
+Ref: fato_pedidos.sk_produto > dim_produtos.sk_produto
+Ref: fato_pedidos.sk_dispositivo > dim_dispositivo.sk_dispositivo
+Ref: fato_pedidos.sk_localidade > dim_localidade.sk_localidade
+Ref: fato_pedidos.sk_forma_pagamento > dim_forma_pagamento.sk_forma_pagamento
+
+Ref: fato_entregas.sk_transportadora > dim_transportadora.sk_transportadora
+Ref: fato_entregas.sk_pessoa > dim_pessoas.sk_pessoa
+Ref: fato_entregas.sk_localidade > dim_localidade.sk_localidade
+Ref: fato_entregas.sk_tempo_saida > dim_tempo.sk_tempo
+Ref: fato_entregas.sk_tempo_entrega > dim_tempo.sk_tempo
+
+Ref: fato_ciclo_pedido.sk_pessoa > dim_pessoas.sk_pessoa
+Ref: fato_ciclo_pedido.sk_tempo_criado > dim_tempo.sk_tempo
+
+Ref: fato_peso_diario.sk_tempo > dim_tempo.sk_tempo
+Ref: fato_peso_diario.sk_transportadora > dim_transportadora.sk_transportadora

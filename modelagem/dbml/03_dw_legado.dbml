@@ -1,0 +1,71 @@
+// ==========================================================================
+// Liga Sudoers - DW LEGADO (ponto de partida do dimensional)
+// Cole este arquivo em https://dbdiagram.io para ver o diagrama.
+// Origem: liga_sudoers/modelagem/ddl/modelagem.txt
+// ==========================================================================
+
+Table dim_pessoas {
+  sk_pessoa integer [pk, increment]
+  id bigint [not null]
+  nome varchar(255)
+  sexo varchar(1)
+  dt_nasc date
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table dim_produtos {
+  sk_produto integer [pk, increment]
+  id integer [not null]
+  cat_desc varchar(255)
+  descricao varchar(255)
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table fato_pedidos {
+  sk_id integer [pk, increment]
+  id_pedido integer [not null]
+  sk_pessoa bigint [not null]
+  sk_produto integer [not null]
+  dispositivo varchar(50) [not null]
+  geohash varchar(50) [not null]
+  telefone varchar(20) [not null]
+  dt_venda timestamp [not null]
+  qtde integer
+  valor_unit numeric(10,2)
+  total numeric(10,2)
+}
+
+Table stg_pessoas {
+  id bigint [not null]
+  nome varchar(255)
+  sexo varchar(1)
+  dt_nasc date
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table stg_produtos {
+  id integer [not null]
+  cat_desc varchar(255) [not null]
+  descricao varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table stg_pedidos {
+  id_pedido integer [not null]
+  id_pessoa bigint [not null]
+  id_produto integer [not null]
+  dispositivo varchar(50) [not null]
+  geohash varchar(50) [not null]
+  telefone varchar(20) [not null]
+  dt_venda timestamp [not null]
+  qtde integer [not null]
+  valor_unit numeric(10,2) [not null]
+  valor_total numeric(10,2) [not null]
+}
+
+Ref: fato_pedidos.sk_pessoa > dim_pessoas.sk_pessoa
+Ref: fato_pedidos.sk_produto > dim_produtos.sk_produto

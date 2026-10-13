@@ -1,0 +1,154 @@
+# ==========================================================================
+# Liga Sudoers - Modelagem de Dados (Parte 3 da Jornada)
+#
+#   postgres_oltp   banco TRANSACIONAL (3FN)       -> voce vai EVOLUIR
+#   postgres_dw     banco DIMENSIONAL (star schema)-> voce vai EVOLUIR
+#   metabase        dashboards (ja vem com os paineis antigos)
+#   metabase_db     banco interno do Metabase
+#   ferramentas     Python com os scripts (so sobe quando chamado)
+#
+# Este repositorio e AUTOCONTIDO: nao depende de nenhum outro repo no ar.
+# As portas foram escolhidas para nao colidir com liga_sudoers,
+# jornada_dados e jornada_dados_nosql, caso voce os tenha rodando.
+# Elas sao publicadas so em 127.0.0.1: os bancos usam senha de laboratorio
+# e nao devem ficar visiveis para a rede.
+# ==========================================================================
+name: jornada_dados_modelagem
+
+x-fuso: &fuso
+  TZ: America/Sao_Paulo
+
+services:
+
+#### Banco TRANSACIONAL (OLTP) - nasce com a modelagem LEGADA (6 tabelas)
+  postgres_oltp:
+    image: postgres:16
+    container_name: modelagem_oltp
+    environment:
+      <<: *fuso
+      POSTGRES_USER: sudoers
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: liga_sudoers
+    ports:
+      - "127.0.0.1:${PORTA_OLTP:-5440}:5432"
+    volumes:
+      - pgdata_oltp:/var/lib/postgresql/data
+      - ./modelagem/ddl/legado/01_oltp_schema.sql:/docker-entrypoint-initdb.d/01_oltp_schema.sql:ro
+      - ./modelagem/ddl/legado/02_oltp_dados_base.sql:/docker-entrypoint-initdb.d/02_oltp_dados_base.sql:ro
+      - ./:/repo:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U sudoers -d liga_sudoers"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [modelagem_net]
+
+#### Banco DIMENSIONAL (DW) - nasce com o star schema LEGADO (vazio)
+  postgres_dw:
+    image: postgres:16
+    container_name: modelagem_dw
+    environment:
+      <<: *fuso
+      POSTGRES_USER: sudoers
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: liga_sudoers_dw
+    ports:
+      - "127.0.0.1:${PORTA_DW:-5441}:5432"
+    volumes:
+      - pgdata_dw:/var/lib/postgresql/data
+      - ./modelagem/ddl/legado/03_dw_schema.sql:/docker-entrypoint-initdb.d/03_dw_schema.sql:ro
+      - ./:/repo:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U sudoers -d liga_sudoers_dw"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [modelagem_net]
+
+#### Dashboards - reaproveitados do repo liga_sudoers
+  metabase:
+    image: metabase/metabase:v0.52.6
+    container_name: modelagem_metabase
+    ports:
+      - "127.0.0.1:${PORTA_METABASE:-3020}:3000"
+    environment:
+      <<: *fuso
+      JAVA_TIMEZONE: America/Sao_Paulo
+      JAVA_OPTS: "-Xmx1g"
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase
+      MB_DB_PASS: metabase
+      MB_DB_HOST: metabase_db
+      MB_SITE_URL: "http://localhost:${PORTA_METABASE:-3020}"
+      MB_CHECK_FOR_UPDATES: "false"
+      MB_ANON_TRACKING_ENABLED: "false"
+    depends_on:
+      metabase_db:
+        condition: service_healthy
+      postgres_oltp:
+        condition: service_healthy
+      postgres_dw:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3000/api/health | grep -q ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 40s
+    networks: [modelagem_net]
+
+  metabase_db:
+    image: postgres:14
+    container_name: modelagem_metabase_db
+    environment:
+      <<: *fuso
+      POSTGRES_USER: metabase
+      POSTGRES_PASSWORD: metabase
+      POSTGRES_DB: metabase
+    volumes:
+      - metabase_db_data:/var/lib/postgresql/data
+      - ./dashboard/metabase_db/01_metabase_backup.sql:/docker-entrypoint-initdb.d/01_metabase_backup.sql:ro
+      - ./dashboard/metabase_db/02_ajustes_modelagem.sql:/docker-entrypoint-initdb.d/02_ajustes_modelagem.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U metabase -d metabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [modelagem_net]
+
+#### Caixa de ferramentas: historico, streaming, conferencia e validacao.
+#### Tem `profiles`, entao NAO sobe no `docker compose up`. So quando chamada.
+  ferramentas: &ferramentas
+    build: ./ferramentas
+    image: jornada_dados_modelagem/ferramentas
+    profiles: ["ferramentas"]
+    environment:
+      <<: *fuso
+      OLTP_HOST: postgres_oltp
+      DW_HOST: postgres_dw
+      METABASE_URL: http://metabase:3000
+      SEMENTE: "${SEMENTE:-42}"
+      N_PEDIDOS: "${N_PEDIDOS:-5000}"
+    volumes:
+      - ./:/app
+    working_dir: /app
+    networks: [modelagem_net]
+
+#### O mesmo streaming, mas em segundo plano (`make streaming-fundo`)
+  streaming:
+    <<: *ferramentas
+    container_name: modelagem_streaming
+    profiles: ["streaming"]
+    command: ["python", "data_simulator/liga_sudoers_streaming.py"]
+    restart: "no"
+
+networks:
+  modelagem_net:
+    name: jornada_dados_modelagem_net
+
+volumes:
+  pgdata_oltp:
+  pgdata_dw:
+  metabase_db_data:
