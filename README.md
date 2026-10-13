@@ -100,14 +100,37 @@ que a disciplina começa.
 ## ✅ Pré-requisitos
 
 * [ ] **Docker** e **Docker Compose v2** (o comando é `docker compose`, com espaço)
+* [ ] **`make`** — todos os comandos da trilha começam com ele
 * [ ] ~3 GB de RAM livres e ~3 GB de disco para as imagens
-* [ ] `make` (opcional — todo comando tem o equivalente em [`docs/comandos.md`](./docs/comandos.md))
 
 > **Você não precisa instalar Python, PostgreSQL nem biblioteca nenhuma.**
 > Tudo roda dentro de containers.
->
-> No Windows, use o **WSL2**. No Mac, dê pelo menos 4 GB de memória ao Docker
-> Desktop (Settings → Resources).
+
+### 🪟 Estou no Windows
+
+Siga primeiro o guia **[Preparando o Windows](./docs/windows.md)**. Ele
+instala o WSL2, o Docker Desktop e o `make`, e baixa o repositório no lugar
+certo. Leva uns 20 minutos, uma vez só.
+
+> ⚠️ No Windows, **todos os comandos da trilha são digitados no terminal do
+> Ubuntu (WSL)**, nunca no PowerShell.
+
+Ao terminar o guia, volte para cá e continue do passo
+[3. Confira o terreno](#3-confira-o-terreno).
+
+### 🐧 Estou no Linux ou no Mac
+
+Além do Docker, falta só o `make`, que não vem com o Docker e na maioria das
+máquinas não vem instalado:
+
+| Sistema | Como instalar |
+|---|---|
+| Ubuntu / Debian | `sudo apt update && sudo apt install make` |
+| Fedora | `sudo dnf install make` |
+| Mac | `xcode-select --install` |
+
+No Mac, dê pelo menos 4 GB de memória ao Docker Desktop (Settings →
+Resources).
 
 ---
 
@@ -120,7 +143,30 @@ git clone https://github.com/sudoers-ai/jornada_dados_modelagem.git
 cd jornada_dados_modelagem
 ```
 
-### 2. Confira o terreno
+(No Windows você já fez isso no [guia de preparação](./docs/windows.md), dentro
+do terminal do Ubuntu.)
+
+### 2. Confira se você tem o `make`
+
+<!-- rodar: shell -->
+```bash
+make --version
+```
+
+Tem que aparecer a versão, em algo como:
+
+```text
+GNU Make 4.3
+```
+
+Se aparecer `make: command not found` (ou `comando não encontrado`):
+
+* **no Windows**, você provavelmente está no PowerShell. Abra o terminal do
+  **Ubuntu** e veja o [guia de preparação](./docs/windows.md);
+* **no Linux ou no Mac**, instale com o comando da tabela
+  [logo acima](#-estou-no-linux-ou-no-mac) e repita este passo.
+
+### 3. Confira o terreno
 
 <!-- rodar: shell -->
 ```bash
@@ -146,7 +192,7 @@ Tudo certo. Próximo passo: make subir
 > Se alguma porta estiver ocupada, a mensagem diz qual linha do arquivo `.env`
 > trocar. Não precisa mexer em mais nada.
 
-### 3. Suba o ambiente
+### 4. Suba o ambiente
 
 <!-- rodar: shell -->
 ```bash
@@ -166,7 +212,7 @@ verá o Docker criando a rede, os volumes e os containers, e no fim:
 O Metabase é o último a ficar pronto (de 15 segundos a 2 minutos, conforme a
 máquina). O comando espera por ele.
 
-### 4. Confira que subiu
+### 5. Confira que subiu
 
 <!-- rodar: shell -->
 ```bash
@@ -237,6 +283,7 @@ ambiente guarda o seu progresso entre uma aula e outra.
 * [📐 Do transacional ao dimensional](./docs/modelagem.md) — o texto que explica o **porquê** de tudo
 * [📖 Glossário](./docs/glossario.md) — grão, chave substituta, SCD, snapshot... em português claro
 * [✅ Checklist do aluno](./docs/checklist.md) — para marcar o que já fez
+* [🪟 Preparando o Windows](./docs/windows.md) — WSL2, Docker Desktop e `make`, passo a passo
 * [🔎 Validação por evidências](./docs/validacao_evidencia.md) — como provar que cada etapa funcionou
 * [❓ FAQ de aula](./docs/faq.md) — erros comuns e como resolver
 * [⌨️ Comandos](./docs/comandos.md) — todo `make` e o `docker` equivalente

@@ -8,7 +8,9 @@ evidência está em [validacao_evidencia.md](./validacao_evidencia.md).
 
 ### 0) Preparação do ambiente
 
+* [ ] **Windows:** segui o guia [Preparando o Windows](./windows.md) e estou no terminal do Ubuntu (WSL)
 * [ ] Docker e Docker Compose v2 instalados
+* [ ] `make --version` mostra a versão do `make`
 * [ ] `make verificar` terminou com **Tudo certo**
 * [ ] `make subir` terminou com **Tudo no ar**
 * [ ] `make status` mostra os 4 containers `healthy`

@@ -2,9 +2,15 @@
 
 > ⬅️ [README principal](../README.md)
 
-Todo `make` deste repositório é um atalho para um comando `docker`. Se você
-não tem `make` (ou quer entender o que está por trás), use a coluna da
-direita. Rode sempre na **pasta raiz** do repositório.
+Todo `make` deste repositório é um atalho para um ou mais comandos `docker`.
+Esta página mostra o que está por trás de cada um: serve para entender o que
+o atalho faz e para investigar quando algo dá errado. Rode sempre na **pasta
+raiz** do repositório.
+
+> O `make` é pré-requisito da trilha. Se você ainda não tem, veja os
+> [pré-requisitos](../README.md#-pré-requisitos). No Windows, tudo desta
+> página é digitado no terminal do Ubuntu (WSL): veja
+> [Preparando o Windows](./windows.md).
 
 ## Ambiente
 

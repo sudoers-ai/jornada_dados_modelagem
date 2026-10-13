@@ -46,10 +46,30 @@ sudo usermod -aG docker $USER
 
 Feche a sessão e entre de novo (ou reinicie) para valer.
 
+### Estou no Windows e nada funciona
+
+Quase sempre é uma destas três coisas: o comando foi digitado no PowerShell
+em vez do terminal do **Ubuntu (WSL)**; o Docker Desktop está fechado; ou o
+repositório foi clonado numa pasta do Windows (`/mnt/c/...`). O guia
+[Preparando o Windows](./windows.md) tem o passo a passo e uma tabela só de
+problemas do Windows.
+
 ### `make: command not found`
 
-Instale o `make` (`sudo apt install make`) ou use os comandos `docker`
-equivalentes, listados em [comandos.md](./comandos.md).
+O `make` é pré-requisito da trilha e não vem com o Docker. Instale:
+
+| Sistema | Como instalar |
+|---|---|
+| Windows | no terminal do **Ubuntu (WSL)**: `sudo apt update && sudo apt install make`. Veja [Preparando o Windows](./windows.md) |
+| Ubuntu / Debian | `sudo apt update && sudo apt install make` |
+| Fedora | `sudo dnf install make` |
+| Mac | `xcode-select --install` |
+
+Confira com `make --version` e rode o comando de novo.
+
+No Windows, se você já instalou e o erro continua, é porque está no
+PowerShell ou no Prompt de Comando: eles não enxergam o `make` do WSL, e os
+scripts do repositório são `bash`.
 
 ### O Metabase fica em `health: starting` e não abre
 
@@ -61,8 +81,13 @@ make logs s=metabase
 ```
 
 Procure a linha `Metabase Initialization COMPLETE`. Se ela não aparecer em 5
-minutos, a causa quase sempre é memória: dê pelo menos 4 GB ao Docker (Docker
-Desktop → Settings → Resources) e rode `make consertar`.
+minutos, a causa quase sempre é memória. Feche outros programas e rode
+`make consertar`.
+
+* **No Mac:** dê pelo menos 4 GB ao Docker em Docker Desktop → Settings →
+  Resources.
+* **No Windows:** quem define a memória é o WSL, que por padrão pode usar até
+  metade da RAM do computador. Não há o que ajustar no Docker Desktop.
 
 ### Subi, derrubei e os dados sumiram
 
