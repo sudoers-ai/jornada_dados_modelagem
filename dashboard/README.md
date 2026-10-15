@@ -15,6 +15,11 @@ de modelagem das etapas anteriores, agora visível num gráfico.
 
 A prova, como sempre, é um comando: `make conferir-dashboards`.
 
+> 📺 **Para assistir antes** (opcional, ~8 min). Os vídeos mostram o ambiente **antigo** do `liga_sudoers` (6 tabelas, ETL no Apache Hop): é o ponto de partida desta disciplina, não o passo a passo desta etapa.
+>
+> - [Data Modeling 09 - Brincando com as ferramentas de BI](https://www.youtube.com/watch?v=BgMohyMNDxo&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=10)
+> - [Data Modeling 10 - Fazendo dashboards analíticos](https://www.youtube.com/watch?v=pW93kToeiUE&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=11)
+
 ---
 
 ## 8.1 O estrago

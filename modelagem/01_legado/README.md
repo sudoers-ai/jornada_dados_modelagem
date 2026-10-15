@@ -7,6 +7,13 @@ etapa você **não altera nada**: só olha. O objetivo é sair daqui sabendo
 dizer, com as suas palavras, o que a modelagem de hoje guarda — e o que ela
 não tem como guardar.
 
+> 📺 **Para assistir antes** (opcional, ~24 min). Os vídeos mostram o ambiente **antigo** do `liga_sudoers` (6 tabelas, ETL no Apache Hop): é o ponto de partida desta disciplina, não o passo a passo desta etapa.
+>
+> - [Data Modeling 01 - Introdução ao ambiente](https://www.youtube.com/watch?v=Kc-mmy8eMcA&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=1)
+> - [Data Modeling 02 - DER e ambiente transacional](https://www.youtube.com/watch?v=_fgJFmmQVaU&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=3)
+> - [Data Modeling 03 - Entendendo o transacional e suas limitações na modelagem analítica](https://www.youtube.com/watch?v=5o1Dxz91rKY&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=4)
+> - [Data Modeling 04 - Dashboards operacionais](https://www.youtube.com/watch?v=ZLtfLNKB3l4&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=5)
+
 ---
 
 ## A empresa hoje

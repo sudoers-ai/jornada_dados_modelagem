@@ -9,6 +9,11 @@ e olha os dashboards funcionando. Depois, com três consultas, descobre que
 eles estão errados há muito tempo — e que o erro não é de SQL. É de
 **modelagem**.
 
+> 📺 **Para assistir antes** (opcional, ~9 min). Os vídeos mostram o ambiente **antigo** do `liga_sudoers` (6 tabelas, ETL no Apache Hop): é o ponto de partida desta disciplina, não o passo a passo desta etapa.
+>
+> - [Data Modeling 05 - Avançando para uma modelagem dimensional](https://www.youtube.com/watch?v=DZi_7rLBguk&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=6)
+> - [Data Modeling 06 - Construindo meu Data Warehouse (DW)](https://www.youtube.com/watch?v=7iB8tvWbVpw&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=7)
+
 ---
 
 ## 5.1 Por que existe um segundo banco?

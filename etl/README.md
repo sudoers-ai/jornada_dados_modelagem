@@ -23,6 +23,11 @@ o que acontece com o dado no caminho do transacional até o dimensional.
 | **T** — *Transform* | Mudar a forma do dado | Dentro de cada passo, de 02 a 12 |
 | **L** — *Load* | Gravar no destino | O `INSERT` ou `MERGE` no fim de cada passo |
 
+> 📺 **Para assistir antes** (opcional, ~17 min). Os vídeos mostram o ambiente **antigo** do `liga_sudoers` (6 tabelas, ETL no Apache Hop): é o ponto de partida desta disciplina, não o passo a passo desta etapa.
+>
+> - [Data Modeling 07 - O poder do ETL e do SQL para manipular os dados](https://www.youtube.com/watch?v=DHinno_tFmc&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=8)
+> - [Data Modeling 08 - Movendo dados com ETL](https://www.youtube.com/watch?v=QoO1Q0JsrBs&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=9)
+
 ---
 
 ## Como trabalhar nesta etapa

@@ -278,6 +278,26 @@ ambiente guarda o seu progresso entre uma aula e outra.
 
 ---
 
+## 📺 Recursos complementares
+
+A playlist [Data Modeling - Jornada Engenheiro de Dados](https://www.youtube.com/watch?v=Kc-mmy8eMcA&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8) mostra, em vídeo, o caminho do transacional ao dashboard no ambiente **antigo** do [`liga_sudoers`](https://github.com/sudoers-ai/liga_sudoers). É o ponto de partida desta disciplina: assista para entender o "antes", e use os roteiros para fazer o "depois". Cada etapa da trilha indica os vídeos que combinam com ela.
+
+- [Data Modeling 01 - Introdução ao ambiente](https://www.youtube.com/watch?v=Kc-mmy8eMcA&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=1)  
+- [Mapa Engenharia de Dados 01 - Roadmap de aprendizado](https://www.youtube.com/watch?v=5kRAXMmogT4&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=2)  
+- [Data Modeling 02 - DER e ambiente transacional](https://www.youtube.com/watch?v=_fgJFmmQVaU&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=3)  
+- [Data Modeling 03 - Entendendo o transacional e suas limitações na modelagem analítica](https://www.youtube.com/watch?v=5o1Dxz91rKY&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=4)  
+- [Data Modeling 04 - Dashboards operacionais](https://www.youtube.com/watch?v=ZLtfLNKB3l4&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=5)  
+- [Data Modeling 05 - Avançando para uma modelagem dimensional](https://www.youtube.com/watch?v=DZi_7rLBguk&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=6)  
+- [Data Modeling 06 - Construindo meu Data Warehouse (DW)](https://www.youtube.com/watch?v=7iB8tvWbVpw&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=7)  
+- [Data Modeling 07 - O poder do ETL e do SQL para manipular os dados](https://www.youtube.com/watch?v=DHinno_tFmc&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=8)  
+- [Data Modeling 08 - Movendo dados com ETL](https://www.youtube.com/watch?v=QoO1Q0JsrBs&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=9)  
+- [Data Modeling 09 - Brincando com as ferramentas de BI](https://www.youtube.com/watch?v=BgMohyMNDxo&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=10)  
+- [Data Modeling 10 - Fazendo dashboards analíticos](https://www.youtube.com/watch?v=pW93kToeiUE&list=PLD3-a_5KsN3mBrcfHfB8i3erZf_9eqfw8&index=11)  
+
+Deixe seu like e comentário nos vídeos do YouTube, isso ajuda e incentiva nosso trabalho.
+
+---
+
 ## 📚 Material de apoio
 
 * [📐 Do transacional ao dimensional](./docs/modelagem.md) — o texto que explica o **porquê** de tudo
